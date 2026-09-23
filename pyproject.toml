@@ -3,5 +3,26 @@ name = "imitation-learning-deep-dive"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
+authors = [
+    { name = "Rishabh Malviya", email = "rishabh.malviya@gmail.com" }
+]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "gymnasium==1.3.0",
+    "h5py>=3.16.0",
+    "imageio>=2.37.4",
+    "imageio-ffmpeg>=0.6.0",
+    "jupyter>=1.1.1",
+    "matplotlib>=3.11.2",
+    "metaworld>=3.1.1",
+    "numpy>=2.5.3",
+    "torch>=2.14.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.10.2,<0.11.0"]
+build-backend = "uv_build"
+
+[tool.pyright]
+reportArgumentType = "none"
+reportCallIssue = "none"
