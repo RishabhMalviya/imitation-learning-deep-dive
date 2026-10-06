@@ -69,7 +69,7 @@ def make_env(task: str, seed: int = 0, render: bool = False, camera: str = 'corn
 
     env = gym.make(
         'Meta-World/MT1', env_name=task,
-        seed=seed,
+        seed=seed, num_goals=1_000,
         render_mode='rgb_array' if render else None,
         camera_name=camera if render else None,
     )
