@@ -34,9 +34,9 @@ Observation layout in Metaworld environments (https://metaworld.farama.org/bench
   [36:39] goal xyz
 """
 OBS_DIM = 39
-HAND_POS = slice(0, 3)
-GRIPPER = slice(3, 4)
-OBJ1_POS = slice(4, 7)
+GRIPPER_POS = slice(0, 3)
+GRIPPER_CLOSE_AMOUNT = slice(3, 4)
+PUCK_POS = slice(4, 7)
 PREV_OBS = slice(18, 36)
 GOAL_POS = slice(36, 39)
 
