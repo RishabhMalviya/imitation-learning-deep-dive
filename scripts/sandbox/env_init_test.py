@@ -7,7 +7,7 @@ from imitation_learning_deep_dive.envs import TASK, make_env, oracle_for
 
 
 
-def run(task, seed, render=False, every=2, noisy_states=False):
+def run(task, seed, gripper_action_override: float, render=False, every=2, noisy_states=False):
     env, oracle = make_env(task, seed=seed, render=render), oracle_for(task)
     rng = np.random.default_rng(seed)
 
@@ -22,6 +22,8 @@ def run(task, seed, render=False, every=2, noisy_states=False):
         t += 1
         
         action = np.clip(oracle.get_action(obs), -1, 1)
+        # Override to see effect of -1.0 on gripper
+        action[-1] = gripper_action_override
         obs, _, truncate, terminate, info = env.step(action)
 
         # Inject state noise
@@ -38,36 +40,25 @@ def run(task, seed, render=False, every=2, noisy_states=False):
             solved = True
             break
 
+        if t > 1000:
+            break
+
     env.close()
 
     return solved, t, frames
 
 
-
 if __name__ == "__main__":
-    # Oracle Success Rate Test
-    num_instances = 10
-
-    print(f"\nRolling out oracle on {num_instances} instances of {TASK} without rendering ...")
-
-    t0 = time.time()
-    successes = [run(TASK, seed=s)[0] for s in range(num_instances)]
-    t1 = time.time()
-
-    print(f"  Success rate: {np.mean(successes):.0%} over {num_instances} eps in {t1 - t0:.1f}s")
-
-
     # Oracle Rollout for Video
-    print(f"\nRolling out oracle on 1 instance of {TASK} for rendering...")
+    for gripper_action_override in [-1.0, -0.5, 0.0, 0.5, 1.0]:
+        print(f"\nRolling out oracle with gripper action override set to {gripper_action_override}...")
 
-    t0 = time.time()
-    solved, steps, frames = run(TASK, seed=0, render=True)
-    t1 = time.time()
-    print(f"  solved={solved} steps={steps} frames={len(frames)}")
-    print(f"  Render speed: {len(frames) / (t1 - t0):.0f} fps (total time {t1 - t0:.1f}s)")
+        t0 = time.time()
+        solved, steps, frames = run(TASK, seed=0, gripper_action_override=gripper_action_override, render=True)
+        t1 = time.time()
 
-    out = f"out/oracle_{TASK.split('-v3')[0].replace('-', '_')}.mp4"
-    print(f"\n  Saving rendered video to {out}")
-    imageio.mimsave(out, frames, fps=15, macro_block_size=1)
-    print(f"  Saved rendered video to {out}")
+        out = f"out/oracle_{TASK.split('-v3')[0].replace('-', '_')}_gripper_{gripper_action_override}.mp4"
+        print(f"\n  Saving rendered video to {out}")
+        imageio.mimsave(out, frames, fps=15, macro_block_size=1)
+        print(f"  Saved rendered video to {out}")
 

@@ -40,7 +40,16 @@ OBJ1_POS = slice(4, 7)
 PREV_OBS = slice(18, 36)
 GOAL_POS = slice(36, 39)
 
-ACT_DIM = 4  # [dx, dy, dz, grab_effort], each clipped to [-1, 1]
+"""
+Actions space documentation - https://metaworld.farama.org/benchmark/action_space/
+[dx, dy, dz, grab_effort], each clipped to [-1, 1]
+
+The `grab_effort` behaves peculiarly:
+- 0.0 corresponds to a fully open gripper
+- Moving towards 1.0 closes the gripper. 
+- Moving towards -1.0 does nothing
+"""
+ACT_DIM = 4  # 
 
 
 def oracle_for(task: str):
