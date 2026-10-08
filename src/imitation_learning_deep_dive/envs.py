@@ -14,10 +14,12 @@ Task                          Bottleneck        Description
 """
 import os
 os.environ.setdefault("MUJOCO_GL", "osmesa")  # must precede the mujoco import (change to "egl" if you have a working EGL backend)
+import torch._dynamo  # noqa: E402, F401  # loads triton's LLVM; segfaults if loaded after OSMesa (torch optimizers import it lazily)
 
 import metaworld  # noqa: E402
 import metaworld.policies as mw_policies  # noqa: E402
 
+import numpy as np
 import gymnasium as gym
 
 
@@ -37,6 +39,7 @@ OBS_DIM = 39
 GRIPPER_POS = slice(0, 3)
 GRIPPER_CLOSE_AMOUNT = slice(3, 4)
 PUCK_POS = slice(4, 7)
+PUCK_QUAT = slice(7, 11)
 PREV_OBS = slice(18, 36)
 GOAL_POS = slice(36, 39)
 
@@ -50,6 +53,14 @@ The `grab_effort` behaves peculiarly:
 - Moving towards -1.0 does nothing
 """
 ACT_DIM = 4  # 
+
+
+def filter_observation(obs: np.ndarray, task: str):
+    """Keep only the relevant parts of the observation ([:11] + [36:])"""
+    if task == "pick-place-v3":
+        return np.concatenate([obs[..., :11], obs[..., 36:]], axis=-1)
+    else:
+        return obs
 
 
 def oracle_for(task: str):
